@@ -1,0 +1,15 @@
+{
+  "_comment": "Firefox Manifest V3 Override - Merged with base manifest.josn during build",
+  "_firefox_version": "Requires Firefox 109+ for Manifest V3 support",
+  "_background_note": "Firefox uses 'scripts' instead of 'service_worker'",
+  
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "model-watcher@perplexity.ai",
+      "strict_min_version": "109.0"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}
