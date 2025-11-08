@@ -15,6 +15,11 @@
 - 🔐 Privacy‑first: no data collection, all local
 - ⚡ Minimal permissions: `storage`, `tabs`, host = `https://*.perplexity.ai/*`
 
+## 📚 Documentation
+
+- **[Manifest Differences](MANIFEST_DIFFERENCES.md)** - Detailed explanation of Chrome vs Firefox manifest configurations
+- **[Privacy Policy](PRIVACY.md)** - Data collection and privacy practices
+- **[Contributing Guide](CONTRIBUTING.md)** - Development guidelines (coming soon)
 
 ---
 
