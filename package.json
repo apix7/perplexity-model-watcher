@@ -26,7 +26,8 @@
     "chrome",
     "brave",
     "perplexity",
-    "model-watcher"
+    "model-watcher",
+    "manifest-v3"
   ],
   "engines": {
     "node": ">=18.0.0",

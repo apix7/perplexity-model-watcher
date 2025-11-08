@@ -8,3 +8,8 @@ Thumbs.db
 
 # Node (not used, but common)
 node_modules/
+
+# Build system artifacts
+dist/
+artifacts/
+web-ext-artifacts/
