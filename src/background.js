@@ -1,3 +1,7 @@
+// Import WebExtension polyfill for cross-browser compability
+// This provides the unified 'browser' API namespace
+importScripts('browser-polyfill.js');
+
 // Background service worker for Model Watcher
 // Keeps last seen model info per tab and sets the badge color/text
 

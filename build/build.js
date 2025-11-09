@@ -146,6 +146,14 @@ async function copySourceFiles(srcDir, destDir) {
       await fs.copy(srcPath, destPath);
     }
 
+    // Verify polyfill was copied
+    const polyfillDest = path.join(destDir, 'browser-polyfill.js');
+    if (await fs.pathExists(polyfillDest)) {
+      logInfo('  ✓ browser-polyfill.js included');
+    } else {
+      logWarning('  ⚠ browser-polyfill.js not found in source');
+    }
+
     logSuccess(`Copied source files to: ${path.relative(process.cwd(), destDir)}`);
   } catch (error) {
     logError(`Failed to copy source files: ${error.message}`);
