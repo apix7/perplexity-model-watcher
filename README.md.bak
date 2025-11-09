@@ -12,7 +12,7 @@
 
 ## ✨ Features
 
-- 🎯 **Real‑time monitoring**: Watches fetch/HR responses and extracts model fields
+- 🎯 **Real‑time monitoring**: Watches fetch/XHR responses and extracts model fields
 - 🖼️ **Interactive overlay**: Draggable/minimizable card with colored status chip
 - 🟢/🔴 **Smart badge**: Shows OK when display == user‑selected; ! on mismatch
 - 🔐 **Privacy‑first**: No data collection, everything stays local

@@ -54,7 +54,6 @@ This release adds full Firefox support through Manifest V3, complete build syste
 #### Documentation
 - 📖 `CONTRIBUTING.md` - Comprehensive contribution guidelines
 - 📝 `MANIFEST_DIFFERENCES.md` - Chrome vs Firefox manifest technical documentation
-- 🔍 `BROWSER_COMPATIBILITY.md` - API compatibility investigation report
 - 📋 `TESTING_FIREFOX.md` - Firefox functionality testing checklist
 - 📋 `TESTING_CHROME.md` - Chrome regression testing checklist
 - 📊 `LINT_REPORT.md` - web-ext validation results

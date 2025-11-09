@@ -104,8 +104,7 @@ perplexity-model-watcher/
 ├── web-ext-config.mjs            # Firefox development configuration
 ├── package.json                  # npm scripts and dependencies
 ├── README.md                     # User documentation
-├── MANIFEST_DIFFERENCES.md       # Technical documentation
-└── BROWSER_COMPATIBILITY.md      # Compatibility report
+└── MANIFEST_DIFFERENCES.md       # Technical documentation
 ```
 
 **Important**: 
@@ -814,7 +813,6 @@ Update documentation when you:
 - **README.md**: User-facing documentation
 - **CONTRIBUTING.md**: This file (contributor guide)
 - **MANIFEST_DIFFERENCES.md**: Technical manifest documentation
-- **BROWSER_COMPATIBILITY.md**: API compatibility information
 - **CHANGELOG.md**: Version history
 
 ---
@@ -831,7 +829,6 @@ Update documentation when you:
 ### Project Documentation
 
 - [Manifest Differences](MANIFEST_DIFFERENCES.md)
-- [Browser Compatibility Report](BROWSER_COMPATIBILITY.md)
 - [Privacy Policy](PRIVACY.md)
 
 ---
