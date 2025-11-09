@@ -9,13 +9,15 @@
     "build": "npm run copy:polyfill && npm run build:chrome && npm run build:firefox",
     "build:chrome": "node build/build.js chrome",
     "build:firefox": "node build/build.js firefox",
+    "test": "npm run test:build",
+    "test:build": "npm run build && node build/test-build.js",
+    "validate": "node build/test-build.js",
     "dev:firefox": "npm run build:firefox && web-ext run --source-dir=./dist/firefox/",
     "dev:chrome": "npm run build:chrome && echo '  Load dist/chrome/ manually in chrome://extensions'",
     "lint:firefox": "web-ext lint --source-dir=./dist/firefox/",
     "package:firefox": "web-ext build --source-dir=./dist/firefox/ --artifacts-dir=./artifacts/",
     "package:chrome": "cd dist/chrome && zip -r ../../artifacts/chrome-extension.zip . && cd ../..",
-    "clean": "rm -rf dist/ artifacts/ web-ext-artifacts/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -rf dist/ artifacts/ web-ext-artifacts/"
   },
   "repository": {
     "type": "git",
