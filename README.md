@@ -1,118 +1,378 @@
 # 🔍 Perplexity Model Watcher
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.1-brightgreen.svg)](https://github.com/apix7/perplexity-model-watcher/releases)
+[![Version](https://img.shields.io/badge/version-0.2.0-brightgreen.svg)](https://github.com/apix7/perplexity-model-watcher/releases)
+[![Chrome](https://img.shields.io/badge/Chrome-✓-green.svg)](https://github.com/apix7/perplexity-model-watcher)
+[![Firefox](https://img.shields.io/badge/Firefox-✓-orange.svg)](https://github.com/apix7/perplexity-model-watcher)
+[![Brave](https://img.shields.io/badge/Brave-✓-green.svg)](https://github.com/apix7/perplexity-model-watcher)
 
-> Brave/Chrome extension that shows Perplexity's `display_model` and `user_selected_model` in‑page and on the toolbar. 🟢 OK when equal, 🔴 on mismatch. Privacy‑friendly, minimal permissions.
+> Cross-browser extension for Chrome, Brave, and Firefox that shows Perplexity's `display_model` and `user_selected_model` in‑page and on the toolbar. 🟢 OK when equal, 🔴 on mismatch. Privacy‑friendly, minimal permissions.
 
 ---
 
 ## ✨ Features
 
-- 🎯 Real‑time: watches fetch/XHR responses and extracts model fields
-- 🖼️ Overlay: draggable/minimizable card with colored status chip
-- 🟢/🔴 Badge: OK when display == user‑selected; ! on mismatch
-- 🔐 Privacy‑first: no data collection, all local
-- ⚡ Minimal permissions: `storage`, `tabs`, host = `https://*.perplexity.ai/*`
-
-## 📚 Documentation
-
-- **[Manifest Differences](MANIFEST_DIFFERENCES.md)** - Detailed explanation of Chrome vs Firefox manifest configurations
-- **[Privacy Policy](PRIVACY.md)** - Data collection and privacy practices
-- **[Contributing Guide](CONTRIBUTING.md)** - Development guidelines (coming soon)
+- 🎯 **Real‑time monitoring**: Watches fetch/XHR responses and extracts model fields
+- 🖼️ **Interactive overlay**: Draggable/minimizable card with colored status chip
+- 🟢/🔴 **Smart badge**: Shows OK when display == user‑selected; ! on mismatch
+- 🔐 **Privacy‑first**: No data collection, everything stays local
+- ⚡ **Minimal permissions**: Only `storage`, `tabs`, and `https://*.perplexity.ai/*`
+- 🌐 **Cross-browser**: Works on Chrome, Brave, and Firefox with Manifest V3
 
 ---
 
-## ✨ Firefox and mobile devices workaround ✨
+## 🚀 Installation
 
-1. **Original URL**
-   
-https://www.perplexity.ai/search/analyze-this-week-s-most-signi-l0URrTaLRw2jqeFyjlr8k1
+### Chrome & Brave (Developer Mode)
 
-2. **Replace** the segment `search` with `rest/thread`.
-   
-https://www.perplexity.ai/rest/thread/analyze-this-week-s-most-signi-l0URrTaLRw2jqeFyjlr8k1
-
-3. **Open** the new URL in your browser.  
-
-4. Press **Ctrl + F** and search for the strings  
-
-- `display_model`  
-- `user_selected_model`  
-
-
----
-
-## 🚀 Install (Developer Mode)
-
-1. Clone the repo (or download the zip and extract):
+1. **Clone or download** the repository:
    ```bash
    git clone https://github.com/apix7/perplexity-model-watcher.git
    cd perplexity-model-watcher
    ```
-2. Open the extensions page:
-   - Brave: `brave://extensions`
-   - Chrome: `chrome://extensions`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select this folder
+
+2. **Install dependencies** (for building):
+   ```bash
+   npm install
+   ```
+
+3. **Build the Chrome version**:
+   ```bash
+   npm run build:chrome
+   ```
+
+4. **Load in browser**:
+   - **Chrome**: Navigate to `chrome://extensions/`
+   - **Brave**: Navigate to `brave://extensions/`
+   - Enable "Developer mode" (toggle in top-right)
+   - Click "Load unpacked"
+   - Select the `dist/chrome/` directory
+
+### Firefox (Developer Mode)
+
+1. **Clone or download** the repository:
+   ```bash
+   git clone https://github.com/apix7/perplexity-model-watcher.git
+   cd perplexity-model-watcher
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Build the Firefox version**:
+   ```bash
+   npm run build:firefox
+   ```
+
+4. **Load in Firefox** (choose one method):
+
+   **Method A: Using web-ext (Recommended)**
+   ```bash
+   npm run dev:firefox
+   ```
+   This automatically launches Firefox with the extension loaded.
+
+   **Method B: Manual Installation**
+   - Open Firefox
+   - Navigate to `about:debugging#/runtime/this-firefox`
+   - Click "Load Temporary Add-on"
+   - Select any file in the `dist/firefox/` directory (e.g., `manifest.json`)
+
+---
+
+## 📦 Quick Start (All Browsers)
+
+```bash
+# Clone repository
+git clone https://github.com/apix7/perplexity-model-watcher.git
+cd perplexity-model-watcher
+
+# Install dependencies
+npm install
+
+# Build for both browsers
+npm run build
+
+# Test in Firefox (auto-launches)
+npm run dev:firefox
+
+# Test in Chrome (manual load from dist/chrome/)
+npm run build:chrome
+# Then load dist/chrome/ in chrome://extensions/
+```
+
+---
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Node.js 18.0.0 or higher
+- npm 9.0.0 or higher
+- Firefox Developer Edition (recommended) or regular Firefox
+- Chrome/Brave browser
+
+### Build Commands
+
+```bash
+# Build both browsers
+npm run build
+
+# Build Chrome only
+npm run build:chrome
+
+# Build Firefox only
+npm run build:firefox
+
+# Clean build artifacts
+npm run clean
+
+# Run tests
+npm test
+```
+
+### Development Workflow
+
+**Firefox Development** (with hot reload):
+```bash
+npm run dev:firefox
+```
+Launches Firefox with the extension and auto-reloads on changes.
+
+**Chrome Development**:
+```bash
+npm run build:chrome
+# Manually reload in chrome://extensions/
+```
+
+### Lint & Validation
+
+```bash
+# Validate Firefox build
+npm run lint:firefox
+
+# Run build validation tests
+npm run validate
+```
+
+### Project Structure
+
+```bash
+perplexity-model-watcher/
+├── src/                      # Source files
+│   ├── manifest.json         # Base manifest (Chrome)
+│   ├── manifest-firefox.json # Firefox overrides
+│   ├── background.js         # Background script
+│   ├── interceptor.js        # Content script
+│   ├── page-probe.js         # Page context script
+│   ├── popup.html/js         # Popup interface
+│   └── options.html/js       # Options page
+├── build/                    # Build scripts
+│   ├── build.js              # Main build script
+│   └── test-build.js         # Build validation
+├── dist/                     # Distribution builds (generated)
+│   ├── chrome/               # Chrome/Brave build
+│   └── firefox/              # Firefox build
+└── web-ext-config.mjs        # Firefox dev configuration
+```
 
 ---
 
 ## ⚙️ Options
 
-- Toggle the in‑page overlay from the Options page.
+- **Show Overlay**: Toggle the in‑page overlay on/off
+  - Access via the extension popup → "Open Options"
+  - Or right-click extension icon → "Options"
+
+---
+
+## 🌐 Browser Compatibility
+
+| Feature | Chrome | Brave | Firefox |
+|---------|--------|-------|---------|
+| Model Detection | ✅ | ✅ | ✅ |
+| Overlay Display | ✅ | ✅ | ✅ |
+| Badge Updates | ✅ | ✅ | ✅ |
+| Options Page | ✅ | ✅ | ✅ |
+| Multi-Tab Support | ✅ | ✅ | ✅ |
+
+**Minimum Versions**:
+- Chrome 88+ (Manifest V3 support)
+- Firefox 109+ (Manifest V3 support)
+- Brave (Chromium-based, same as Chrome)
+
+---
+
+## 🔧 Troubleshooting
+
+### Firefox Issues
+
+**Extension won't load:**
+- Ensure you built the Firefox version: `npm run build:firefox`
+- Check Firefox version: Must be 109.0 or higher
+- Try loading from `about:debugging` instead
+
+**web-ext not found:**
+```bash
+npm install --save-dev web-ext
+```
+
+**Firefox binary not found:**
+- Edit `web-ext-config.mjs` and set the correct Firefox path
+- Or use `npx web-ext run --firefox=firefox` to use regular Firefox
+
+### Chrome/Brave Issues
+
+**Extension won't load:**
+- Ensure you built the Chrome version: `npm run build:chrome`
+- Enable "Developer mode" in extensions page
+- Load from `dist/chrome/` directory, not `src/`
+
+**Service worker errors:**
+- Check console in `chrome://extensions/` → service worker link
+- Verify all files present in `dist/chrome/`
+
+### Build Issues
+
+**Build fails:**
+```bash
+# Clean and rebuild
+npm run clean
+npm install
+npm run build
+```
+
+**Missing files:**
+- Ensure all dependencies installed: `npm install`
+- Check that `src/` directory contains all source files
+
+---
+
+## 📚 Documentation
+
+- **[Manifest Differences](MANIFEST_DIFFERENCES.md)** - Chrome vs Firefox manifest configuration explained
+- **[Browser Compatibility](BROWSER_COMPATIBILITY.md)** - API compatibility investigation report
+- **[Privacy Policy](PRIVACY.md)** - Data collection and privacy practices
+- **[Contributing Guide](CONTRIBUTING.md)** - Development guidelines (coming soon)
+- **[Changelog](CHANGELOG.md)** - Version history and changes (coming soon)
 
 ---
 
 ## 🛡️ Privacy & Permissions
 
-- No data is sent anywhere. See [PRIVACY.md](PRIVACY.md).
-- Permissions:
-  - `storage` — save overlay toggle
-  - `tabs` — update toolbar badge
-  - Host access: `https://*.perplexity.ai/*` only
+- **Zero data collection** — Nothing is sent anywhere. Everything runs locally.
+- See detailed [Privacy Policy](PRIVACY.md)
+
+### Permissions Explained:
+- **`storage`** — Save overlay toggle preference and position locally
+- **`tabs`** — Update toolbar badge per tab
+- **Host access**: `https://*.perplexity.ai/*` — Only active on Perplexity pages
 
 ---
 
 ## 🤝 Contributing
 
-PRs welcome! Open an issue for ideas/bugs.
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make your changes in the `src/` directory
+4. Build and test in both browsers:
+   ```bash
+   npm run build
+   npm run validate
+   npm run dev:firefox  # Test in Firefox
+   # Load dist/chrome/ in Chrome to test
+   ```
+5. Commit your changes: `git commit -m 'feat: Add my feature'`
+6. Push to your fork: `git push origin feature/my-feature`
+7. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines (coming soon).
+
+**Bug Reports & Feature Requests**: Open an issue on GitHub!
 
 ---
 
-## Development Setup
+## 🏗️ Technical Details
 
-### Firefox Developer Edition (Recommended)
+### Architecture
 
-For the best development experience, install Firefox Developer Edition:
+- **Manifest V3** for modern extension architecture
+- **WebExtension Polyfill** for cross-browser API compatibility
+- **Content Script Injection** for capturing network responses
+- **Page Context Probe** for intercepting fetch/XHR calls
+- **Build System** for browser-specific distributions
 
-**Ubuntu/Debian:** Download and install to `/opt`
-```bash
-cd /tmp
-wget "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O firefox-dev.tar.bz2
-sudo tar -xjf firefox-dev.tar.bz2 -C /opt/
-sudo mv /opt/firefox /opt/firefox-dev
-```
+### How It Works
 
-**Create symlink:**
-```bash
-sudo ln -s /opt/firefox-dev/firefox /usr/local/bin/firefox-dev
-```
+1. **Page Probe** (`page-probe.js`): Injected into page context to intercept fetch/XHR
+2. **Content Script** (`interceptor.js`): Receives intercepted data and shows overlay
+3. **Background Script** (`background.js`): Manages badge updates and tab state
+4. **Popup** (`popup.js`): Displays current model status
+5. **Options** (`options.js`): Manages extension settings
 
-**Verify installation:**
-```bash
-firefox-dev --version
-```
+---
 
-**Then run:**
-```bash
-npm run dev:firefox # Opens Firefox Dev Edition with extension
-```
+## 🗺️ Roadmap
 
-If you don't have Firefox Developer Edition, edit `web-ext-config.mjs` and change the `firefox` path to your Firefox binary.
+- [x] Firefox support with Manifest V3
+- [x] Cross-browser build system
+- [x] WebExtension polyfill integration
+- [ ] Chrome Web Store release
+- [ ] Firefox Add-ons (AMO) release
+- [ ] Expected model configuration
+- [ ] Model history tracking
+- [ ] Export/import settings
+
+---
+
+## 📝 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
+---
+
+## ❓ FAQ
+
+**Q: Does this work on mobile?**  
+A: Not directly. For mobile Firefox, use the manual workaround:
+1. Replace `/search/` with `/rest/thread/` in the Perplexity URL
+2. Search for `display_model` and `user_selected_model` in the JSON response
+
+**Q: Why do I need to build the extension?**  
+A: The build system generates browser-specific distributions from shared source code, handling manifest differences and polyfill integration automatically.
+
+**Q: Can I use the same build for Chrome and Firefox?**  
+A: No. Chrome and Firefox require different manifest configurations (service worker vs event page, extension ID requirements, etc.). Use the browser-specific builds from `dist/chrome/` and `dist/firefox/`.
+
+**Q: Will this be available in the Chrome Web Store / Firefox Add-ons?**  
+A: This is planned for future releases. For now, install via developer mode.
+
+---
+
+## 🙏 Acknowledgments
+
+- Built for the Perplexity AI community
+- Uses [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) by Mozilla
+- Tested with [web-ext](https://github.com/mozilla/web-ext) CLI tool
 
 ---
 
 ## 📄 License
 
-MIT © 2025 Model Watcher contributors. See [LICENSE](LICENSE).
+MIT © 2025 Model Watcher contributors. See [LICENSE](LICENSE) for details.
+
+---
+
+## 🔗 Links
+
+- [GitHub Repository](https://github.com/apix7/perplexity-model-watcher)
+- [Report Issues](https://github.com/apix7/perplexity-model-watcher/issues)
+- [Perplexity AI](https://www.perplexity.ai/)
+
+---
+
+**Made with ❤️ for better transparency on Perplexity AI**
