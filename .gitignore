@@ -13,3 +13,6 @@ node_modules/
 dist/
 artifacts/
 web-ext-artifacts/
+
+# Trash
+web-ext-config.mjs.bak

@@ -12,9 +12,11 @@
     "test": "npm run test:build",
     "test:build": "npm run build && node build/test-build.js",
     "validate": "node build/test-build.js",
+    "verify:packages": "node build/verify-package.js",
     "dev:firefox": "npm run build:firefox && web-ext run --source-dir=./dist/firefox/",
     "dev:chrome": "npm run build:chrome && echo '  Load dist/chrome/ manually in chrome://extensions'",
     "lint:firefox": "web-ext lint --source-dir=./dist/firefox/",
+    "package": "npm run package:firefox && npm run package:chrome",
     "package:firefox": "web-ext build --source-dir=./dist/firefox/ --artifacts-dir=./artifacts/",
     "package:chrome": "cd dist/chrome && zip -r ../../artifacts/chrome-extension.zip . && cd ../..",
     "clean": "rm -rf dist/ artifacts/ web-ext-artifacts/"
