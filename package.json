@@ -1,0 +1,54 @@
+{
+  "name": "perplexity-model-watcher",
+  "version": "0.2.0",
+  "description": "Browser extension that shows Perplexity's display_model and user_selected_model with cross-browser support.",
+  "main": "background.js",
+  "scripts": {
+    "prepare": "npm run copy:polyfill",
+    "copy:polyfill": "cp node_modules/webextension-polyfill/dist/browser-polyfill.js src/",
+    "build": "npm run copy:polyfill && npm run build:chrome && npm run build:firefox",
+    "build:chrome": "node build/build.js chrome",
+    "build:firefox": "node build/build.js firefox",
+    "test": "npm run test:build",
+    "test:build": "npm run build && node build/test-build.js",
+    "validate": "node build/test-build.js",
+    "verify:packages": "node build/verify-package.js",
+    "dev:firefox": "npm run build:firefox && web-ext run --source-dir=./dist/firefox/",
+    "dev:chrome": "npm run build:chrome && echo '  Load dist/chrome/ manually in chrome://extensions'",
+    "lint:firefox": "web-ext lint --source-dir=./dist/firefox/",
+    "package": "npm run package:firefox && npm run package:chrome",
+    "package:firefox": "web-ext build --source-dir=./dist/firefox/ --artifacts-dir=./artifacts/",
+    "package:chrome": "cd dist/chrome && zip -r ../../artifacts/chrome-extension.zip . && cd ../..",
+    "clean": "rm -rf dist/ artifacts/ web-ext-artifacts/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apix7/perplexity-model-watcher.git"
+  },
+  "keywords": [
+    "browser-extension",
+    "webextension",
+    "firefox",
+    "chrome",
+    "brave",
+    "perplexity",
+    "model-watcher",
+    "manifest-v3"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "apix7",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/apix7/perplexity-model-watcher/issues"
+  },
+  "homepage": "https://github.com/apix7/perplexity-model-watcher#readme",
+  "devDependencies": {
+    "fs-extra": "^11.3.2",
+    "web-ext": "^9.1.0",
+    "webextension-polyfill": "^0.12.0"
+  }
+}

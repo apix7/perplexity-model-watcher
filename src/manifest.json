@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Model Watcher",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Shows display_model and user_selected_model from page network responses and warns on mismatch.",
   "permissions": ["storage", "tabs"],
   "host_permissions": ["https://*.perplexity.ai/*"],
@@ -15,14 +15,14 @@
   "options_page": "options.html",
   "web_accessible_resources": [
     {
-      "resources": ["page-probe.js"],
+      "resources": ["browser-polyfill.js", "page-probe.js"],
       "matches": ["https://*.perplexity.ai/*"]
     }
   ],
   "content_scripts": [
     {
       "matches": ["https://*.perplexity.ai/*"],
-      "js": ["interceptor.js"],
+      "js": ["browser-polyfill.js", "interceptor.js"],
       "run_at": "document_start"
     }
   ]

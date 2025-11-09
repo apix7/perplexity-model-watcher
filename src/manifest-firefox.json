@@ -1,0 +1,19 @@
+{
+  "_comment": "Firefox Manifest V3 Override Configuration",
+  "_description": "This file contains Firefox-specific manifest overrides that will be merged with the base manifest.json during build",
+  "_firefox_requirements": {
+    "minimum_version": "109.0",
+    "reason": "First stable Firefox release with Manifest V3 support (Jan 2023)",
+    "background_type": "Event page using scripts array (not service worker)"
+  },
+  
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "model-watcher@perplexity.ai",
+      "strict_min_version": "109.0"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

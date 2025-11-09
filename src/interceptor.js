@@ -62,25 +62,24 @@
     (document.head || document.documentElement).appendChild(st);
   }
 
-  function saveOverlayState(el){
+  async function saveOverlayState(el){
     const rect = el.getBoundingClientRect();
     const minimized = el.classList.contains('mw-min');
     const pos = { top: rect.top + window.scrollY, left: rect.left + window.scrollX, minimized };
-    try { chrome.storage.local.set({ [STORE_KEY]: pos }); } catch (_) {}
+    try { await browser.storage.local.set({ [STORE_KEY]: pos }); } catch (_) {}
   }
 
-  function applySavedState(el){
+  async function applySavedState(el){
     try {
-      chrome.storage.local.get({ [STORE_KEY]: null }, (obj)=>{
-        const st = obj && obj[STORE_KEY];
-        if (!st) return;
-        if (typeof st.top === 'number') el.style.top = Math.max(0, st.top) + 'px';
-        if (typeof st.left === 'number') {
-          el.style.left = Math.max(0, st.left) + 'px';
-          el.style.right = 'auto';
-        }
-        if (st.minimized) el.classList.add('mw-min');
-      });
+      const obj = await browser.storage.local.get(STORE_KEY);
+      const st = obj && obj[STORE_KEY];
+      if (!st) return;
+      if (typeof st.top === 'number') el.style.top = Math.max(0, st.top) + 'px';
+      if (typeof st.left === 'number') {
+        el.style.left = Math.max(0, st.left) + 'px';
+        el.style.right = 'auto';
+      }
+      if (st.minimized) el.classList.add('mw-min');
     } catch (_) {}
   }
 
@@ -164,17 +163,19 @@
     if (selEl) selEl.textContent = '—';
   }
 
-  function report(display_model, user_selected_model){
+  async function report(display_model, user_selected_model){
     const matchesEachOther = !!display_model && !!user_selected_model && display_model === user_selected_model;
     const matchesExpected = false;
     setWidget(display_model, user_selected_model, matchesEachOther, matchesExpected);
-    chrome.runtime.sendMessage({
-      type: 'MODEL_UPDATE',
-      payload: {
-        display_model, user_selected_model, matchesEachOther, matchesExpected,
-        ts: Date.now(), url: location.href
-      }
-    }, ()=>{});
+    try {
+      await browser.runtime.sendMessage({
+        type: 'MODEL_UPDATE',
+        payload: {
+          display_model, user_selected_model, matchesEachOther, matchesExpected,
+          ts: Date.now(), url: location.href
+        }
+      });
+    } catch (_) {}
   }
 
   function handleText(text){
@@ -202,18 +203,19 @@
 
   function injectProbe(){
     const s = document.createElement('script');
-    s.src = chrome.runtime.getURL('page-probe.js');
+    s.src = browser.runtime.getURL('page-probe.js');
     s.async = false;
     (document.head || document.documentElement).appendChild(s);
     s.remove();
   }
 
-  function initConfig(){
-    chrome.storage.sync.get({ showOverlay: true }, (cfg)=>{
+  async function initConfig(){
+    try {
+      const cfg = await browser.storage.sync.get({ showOverlay: true });
       STATE.showOverlay = !!cfg.showOverlay;
       if (STATE.showOverlay) ensureWidget();
-    });
-    chrome.storage.onChanged.addListener((changes, area)=>{
+    } catch (_) {}
+    browser.storage.onChanged.addListener((changes, area)=>{
       if (area !== 'sync') return;
       if (changes.showOverlay) STATE.showOverlay = !!changes.showOverlay.newValue;
     });
