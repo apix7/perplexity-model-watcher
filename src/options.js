@@ -1,22 +1,20 @@
 // options.js - save expected model and overlay setting
 
-function $(id){ return document.getElementById(id); }
+function $(id) { return document.getElementById(id); }
 
-function load() {
-  chrome.storage.sync.get({ showOverlay: true }, (items) => {
-    $('showOverlay').checked = !!items.showOverlay;
-  });
+async function load() {
+  const items = await browser.storage.sync.get({ showOverlay: true });
+  $('showOverlay').checked = !!items.showOverlay;
 }
 
-function save() {
+async function save() {
   const showOverlay = $('showOverlay').checked;
-  chrome.storage.sync.set({ showOverlay }, () => {
-    $('status').textContent = 'Saved';
-    setTimeout(() => ($('status').textContent = ''), 1200);
-  });
+  await browser.storage.sync.set({ showOverlay });
+  $('status').textContent = 'Saved';
+  setTimeout(() => { $('status').textContent = ''; }, 1200);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  load();
+document.addEventListener('DOMContentLoaded', async () => {
+  await load();
   $('save').addEventListener('click', save);
 });

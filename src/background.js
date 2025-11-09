@@ -7,18 +7,17 @@ importScripts('browser-polyfill.js');
 
 const stateByTab = {};
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get({ expectedModel: '', showOverlay: true }, (items) => {
-    if (typeof items.expectedModel !== 'string') {
-      chrome.storage.sync.set({ expectedModel: '' });
-    }
-    if (typeof items.showOverlay !== 'boolean') {
-      chrome.storage.sync.set({ showOverlay: true });
-    }
-  });
+browser.runtime.onInstalled.addListener(async () => {
+  const items = await browser.storage.sync.get({ expectedModel: '', showOverlay: true });
+  if (typeof items.expectedModel !== 'string') {
+    await browser.storage.sync.set({ expectedModel: '' });
+  }
+  if (typeof items.showOverlay !== 'boolean') {
+    await browser.storage.sync.set({ showOverlay: true });
+  }
 });
 
-function setBadge(tabId, payload) {
+async function setBadge(tabId, payload) {
   if (!tabId) return;
   const { matchesEachOther } = payload || {};
   let text = '';
@@ -32,27 +31,26 @@ function setBadge(tabId, payload) {
       color = '#ef4444'; // red on mismatch
     }
   }
-  chrome.action.setBadgeText({ tabId, text });
-  chrome.action.setBadgeBackgroundColor({ tabId, color });
+  await Promise.all([
+    browser.action.setBadgeText({ tabId, text }),
+    browser.action.setBadgeBackgroundColor({ tabId, color })
+  ]);
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (!message || !sender || !sender.tab) return; // ignore
+browser.runtime.onMessage.addListener(async (message, sender) => {
+  if (!message || !sender || !sender.tab) return;
   const tabId = sender.tab.id;
 
   if (message.type === 'MODEL_UPDATE') {
     stateByTab[tabId] = message.payload;
-    setBadge(tabId, message.payload);
-    sendResponse({ ok: true });
-    return true; // async response allowed
+    await setBadge(tabId, message.payload);
+    return { ok: true };
   }
 
   if (message.type === 'GET_LAST_FOR_TAB') {
     const { tabId: reqTabId } = message;
     const tabState = stateByTab[reqTabId] || null;
-    chrome.storage.sync.get({ expectedModel: '', showOverlay: true }, (cfg) => {
-      sendResponse({ state: tabState, config: cfg });
-    });
-    return true;
+    const cfg = await browser.storage.sync.get({ expectedModel: '', showOverlay: true });
+    return { state: tabState, config: cfg };
   }
 });

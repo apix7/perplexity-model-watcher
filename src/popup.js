@@ -19,30 +19,29 @@ function setChip(label, cls){
 }
 
 async function init() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  chrome.runtime.sendMessage({ type: 'GET_LAST_FOR_TAB', tabId: tab.id }, (resp) => {
-    const showOverlay = !!resp?.config?.showOverlay;
-    const st = resp?.state || null;
-    setText('display', st?.display_model || '—');
-    setText('selected', st?.user_selected_model || '—');
-    const { label, cls } = statusLabel(st);
-    setChip(label, cls);
-    const meta = document.getElementById('meta');
-    if (st?.ts) {
-      const d = new Date(st.ts);
-      meta.textContent = `Last seen ${d.toLocaleTimeString()} on ${new URL(st.url||location.href).hostname}`;
-    } else {
-      meta.textContent = 'Waiting for a response on this tab…';
-    }
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  const resp = await browser.runtime.sendMessage({ type: 'GET_LAST_FOR_TAB', tabId: tab.id });
+  const showOverlay = !!resp?.config?.showOverlay;
+  const st = resp?.state || null;
+  setText('display', st?.display_model || '—');
+  setText('selected', st?.user_selected_model || '—');
+  const { label, cls } = statusLabel(st);
+  setChip(label, cls);
+  const meta = document.getElementById('meta');
+  if (st?.ts) {
+    const d = new Date(st.ts);
+    meta.textContent = `Last seen ${d.toLocaleTimeString()} on ${new URL(st.url || location.href).hostname}`;
+  } else {
+    meta.textContent = 'Waiting for a response on this tab…';
+  }
 
-    document.getElementById('toggleOverlay').addEventListener('click', ()=>{
-      chrome.storage.sync.set({ showOverlay: !showOverlay });
-    });
+  document.getElementById('toggleOverlay').addEventListener('click', async () => {
+    await browser.storage.sync.set({ showOverlay: !showOverlay });
   });
 
   document.getElementById('openOptions').addEventListener('click', async (e) => {
     e.preventDefault();
-    await chrome.runtime.openOptionsPage();
+    await browser.runtime.openOptionsPage();
   });
 }
 
