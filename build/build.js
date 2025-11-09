@@ -71,6 +71,9 @@ function logError(message) {
 function deepMerge(target, source) {
   const output = { ...target };
 
+  // Keys that should be completely replaced, not merged
+  const replaceKeys = ['background'];
+  
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach((key) => {
 
@@ -79,6 +82,12 @@ function deepMerge(target, source) {
         return;
       }
 
+      // For keys that need complete replacement, just assign the source value
+      if (replaceKeys.includes(key)) {
+        output[key] = source[key];
+        return;
+      }
+      
       if (isObject(source[key])) {
         if (!(key in target)) {
           Object.assign(output, { [key]: source[key] });
