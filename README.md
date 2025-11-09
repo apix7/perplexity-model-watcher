@@ -29,13 +29,13 @@
    
 https://www.perplexity.ai/search/analyze-this-week-s-most-signi-l0URrTaLRw2jqeFyjlr8k1
 
-3. **Replace** the segment `search` with `rest/thread`.
+2. **Replace** the segment `search` with `rest/thread`.
    
 https://www.perplexity.ai/rest/thread/analyze-this-week-s-most-signi-l0URrTaLRw2jqeFyjlr8k1
 
-5. **Open** the new URL in your browser.  
+3. **Open** the new URL in your browser.  
 
-6. Press **Ctrl + F** and search for the strings  
+4. Press **Ctrl + F** and search for the strings  
 
 - `display_model`  
 - `user_selected_model`  
@@ -77,6 +77,39 @@ https://www.perplexity.ai/rest/thread/analyze-this-week-s-most-signi-l0URrTaLRw2
 ## 🤝 Contributing
 
 PRs welcome! Open an issue for ideas/bugs.
+
+---
+
+## Development Setup
+
+### Firefox Developer Edition (Recommended)
+
+For the best development experience, install Firefox Developer Edition:
+
+**Ubuntu/Debian:** Download and install to `/opt`
+```bash
+cd /tmp
+wget "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O firefox-dev.tar.bz2
+sudo tar -xjf firefox-dev.tar.bz2 -C /opt/
+sudo mv /opt/firefox /opt/firefox-dev
+```
+
+**Create symlink:**
+```bash
+sudo ln -s /opt/firefox-dev/firefox /usr/local/bin/firefox-dev
+```
+
+**Verify installation:**
+```bash
+firefox-dev --version
+```
+
+**Then run:**
+```bash
+npm run dev:firefox # Opens Firefox Dev Edition with extension
+```
+
+If you don't have Firefox Developer Edition, edit `web-ext-config.mjs` and change the `firefox` path to your Firefox binary.
 
 ---
 
