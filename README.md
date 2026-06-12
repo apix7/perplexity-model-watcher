@@ -1,7 +1,7 @@
 # 🔍 Perplexity Model Watcher
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.1-brightgreen.svg)](https://github.com/apix7/perplexity-model-watcher/releases)
+[![Version](https://img.shields.io/badge/version-0.1.2-brightgreen.svg)](https://github.com/apix7/perplexity-model-watcher/releases)
 
 > Brave/Chrome extension that shows Perplexity's `display_model` and `user_selected_model` in‑page and on the toolbar. 🟢 OK when equal, 🔴 on mismatch. Privacy‑friendly, minimal permissions.
 

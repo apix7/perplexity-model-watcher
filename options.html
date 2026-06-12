@@ -8,6 +8,7 @@
       label { display: block; margin: 10px 0 4px; color: #374151; }
       input[type=text] { width: 100%; padding: 6px 8px; font: inherit; }
       .row { margin: 8px 0; }
+      .help { font-size: 12px; color: #9ca3af; margin-top: 2px; }
     </style>
   </head>
   <body>
@@ -15,6 +16,11 @@
 
     <div class="row">
       <label><input type="checkbox" id="showOverlay" checked /> Show in-page overlay</label>
+    </div>
+
+    <div class="row">
+      <label><input type="checkbox" id="debugMode" /> Debug logging</label>
+      <div class="help">Enables verbose console output for troubleshooting.</div>
     </div>
 
     <div class="row">
