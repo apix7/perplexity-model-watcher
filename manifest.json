@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Model Watcher",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Shows display_model and user_selected_model from page network responses and warns on mismatch.",
   "permissions": ["storage", "tabs"],
   "host_permissions": ["https://*.perplexity.ai/*"],

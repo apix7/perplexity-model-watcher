@@ -1,16 +1,24 @@
 // interceptor.js - content script. Injects a page-world probe to intercept fetch/XHR,
 // listens for messages, shows overlay, and relays status to background.
 (function(){
-  const STATE = { expected: '', showOverlay: true, lastKey: '' };
+  const TAG = '[MW]';
+  const STATE = { expected: '', showOverlay: true, debugMode: false, lastKey: '' };
   const WIDGET_ID = '__model_watcher_widget__';
+
+  function debugLog(...args) {
+    if (STATE.debugMode) console.log(TAG, ...args);
+  }
 
   function deepFindModels(obj) {
     let found = {};
     function walk(v) {
       if (!v) return;
       if (typeof v === 'object') {
-        if ('display_model' in v && typeof v.display_model === 'string') found.display_model = v.display_model;
-        if ('user_selected_model' in v && typeof v.user_selected_model === 'string') found.user_selected_model = v.user_selected_model;
+        if ('default_model' in v && typeof v.default_model === 'string' && !found.display_model) found.display_model = v.default_model;
+        if ('display_model' in v && typeof v.display_model === 'string' && !found.display_model) found.display_model = v.display_model;
+        if ('model' in v && typeof v.model === 'string' && !found.display_model && v.model.indexOf(' ') === -1 && v.model.length > 4) found.display_model = v.model;
+        if ('model_preference' in v && typeof v.model_preference === 'string' && !found.user_selected_model) found.user_selected_model = v.model_preference;
+        if ('user_selected_model' in v && typeof v.user_selected_model === 'string' && !found.user_selected_model) found.user_selected_model = v.user_selected_model;
         if (found.display_model && found.user_selected_model) return;
         for (const key in v) {
           if (Object.prototype.hasOwnProperty.call(v, key)) walk(v[key]);
@@ -22,17 +30,54 @@
     return found;
   }
 
-  function extractModelsFromText(text){
-    if (!text || (!text.includes('display_model') && !text.includes('user_selected_model'))) return null;
+  function extractModelsFromText(text, source){
+    if (!text) return null;
+
     try {
       const json = JSON.parse(text);
       const f = deepFindModels(json);
-      if (f.display_model || f.user_selected_model) return f;
+      const result = {};
+      if (source === 'response') {
+        if (f.display_model) result.display_model = f.display_model;
+      } else if (source === 'request') {
+        if (f.user_selected_model) result.user_selected_model = f.user_selected_model;
+      }
+      if (result.display_model || result.user_selected_model) return result;
     } catch (e) {}
-    const dm = /"display_model"\s*:\s*"([^"]+)"/.exec(text);
-    const us = /"user_selected_model"\s*:\s*"([^"]+)"/.exec(text);
-    if (dm || us) return { display_model: dm && dm[1], user_selected_model: us && us[1] };
-    return null;
+
+    let responseModel = null;
+    if (source === 'response') {
+      for (const name of ['display_model', 'model', 'model_id', 'model_name']) {
+        const re = new RegExp('"' + name + '"\\s*:\\s*"([^"]+)"', 'g');
+        let m;
+        while ((m = re.exec(text)) !== null) {
+          const val = m[1];
+          if (val.length > 3 && !['search', 'writing', 'reasoning', 'copilot', 'concise', 'default'].includes(val)) {
+            responseModel = val;
+            if (val.length < 40 && !val.includes(' ')) break;
+          }
+        }
+        if (responseModel) break;
+      }
+    }
+
+    let userModel = null;
+    const um = /"model_preference"\s*:\s*"([^"]+)"/.exec(text);
+    if (um) userModel = um[1];
+
+    let defaultModel = null;
+    if (source === 'response') {
+      let dm = /"display_model"\s*:\s*"([^"]+)"/.exec(text);
+      if (!dm) dm = /"default_model"\s*:\s*"([^"]+)"/.exec(text);
+      if (dm) defaultModel = dm[1];
+    }
+
+    const result = {};
+    if (responseModel) result.display_model = responseModel;
+    else if (defaultModel) result.display_model = defaultModel;
+    if (userModel) result.user_selected_model = userModel;
+
+    return (result.display_model || result.user_selected_model) ? result : null;
   }
 
   const STORE_KEY = 'mw_overlay:'+location.origin;
@@ -48,7 +93,6 @@
       .mw-title{font-weight:600;letter-spacing:.2px}
       .mw-chip{font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid transparent}
       .mw-chip-ok{background:#052e1a;color:#34d399;border-color:#065f46}
-      .mw-chip-eq{background:#06223f;color:#60a5fa;border-color:#1d4ed8}
       .mw-chip-bad{background:#3f0610;color:#f87171;border-color:#b91c1c}
       .mw-chip-wait{background:#1f2937;color:#cbd5e1;border-color:#334155}
       .mw-body{padding:6px 10px 10px 10px}
@@ -124,8 +168,8 @@
         <div class="mw-row"><span class="mw-key">Selected</span><span class="mw-val" id="mw-selected">—</span></div>
       </div>`;
     document.documentElement.appendChild(el);
+    debugLog('overlay widget created');
 
-    // Controls
     const header = el.querySelector('#mw-h');
     const minBtn = el.querySelector('#mw-min');
     makeDraggable(el, header);
@@ -134,7 +178,7 @@
     return el;
   }
 
-  function setWidget(display, selected, matches, matchesExpected){
+  function setWidget(display, selected, matches){
     const el = ensureWidget();
     if (!el) return;
     const status = el.querySelector('#mw-status');
@@ -160,30 +204,44 @@
     status.textContent = 'WAIT';
     const dispEl = el.querySelector('#mw-display');
     const selEl = el.querySelector('#mw-selected');
-    if (dispEl) dispEl.textContent = '—';
-    if (selEl) selEl.textContent = '—';
+    if (dispEl) dispEl.textContent = lastModels.display_model || '—';
+    if (selEl) selEl.textContent = lastModels.user_selected_model || '—';
   }
 
+  const lastModels = { display_model: null, user_selected_model: null };
+
   function report(display_model, user_selected_model){
-    const matchesEachOther = !!display_model && !!user_selected_model && display_model === user_selected_model;
-    const matchesExpected = false;
-    setWidget(display_model, user_selected_model, matchesEachOther, matchesExpected);
+    if (display_model !== undefined && display_model !== null) lastModels.display_model = display_model;
+    if (user_selected_model !== undefined && user_selected_model !== null) lastModels.user_selected_model = user_selected_model;
+
+    const dm = lastModels.display_model;
+    const us = lastModels.user_selected_model;
+    const matchesEachOther = !!dm && !!us && dm === us;
+    setWidget(dm, us, matchesEachOther);
+    debugLog('models:', { display_model: dm, user_selected_model: us, matchesEachOther });
     chrome.runtime.sendMessage({
       type: 'MODEL_UPDATE',
       payload: {
-        display_model, user_selected_model, matchesEachOther, matchesExpected,
+        display_model: dm, user_selected_model: us, matchesEachOther,
         ts: Date.now(), url: location.href
       }
-    }, ()=>{});
+    }, () => { if (chrome.runtime.lastError) { /* ignore */ } });
   }
 
-  function handleText(text){
-    const models = extractModelsFromText(text);
+  function handleText(text, source){
+    source = source || 'response';
+    const models = extractModelsFromText(text, source);
     if (!models) return;
-    const key = location.href + '|' + (models.display_model||'')+'|'+(models.user_selected_model||'');
-    if (key === STATE.lastKey) return; // avoid spamming identical updates per URL
+
+    const display_model = models.display_model;
+    const user_selected_model = models.user_selected_model;
+
+    if (!display_model && !user_selected_model) return;
+
+    const key = location.href + '|' + (display_model||'')+'|'+(user_selected_model||'');
+    if (key === STATE.lastKey) return;
     STATE.lastKey = key;
-    report(models.display_model, models.user_selected_model);
+    report(display_model, user_selected_model);
   }
 
   function listenFromPage(){
@@ -192,30 +250,54 @@
       const d = ev.data;
       if (!d || d.__mw !== true) return;
       if (d.type === 'MODEL_TEXT') {
-        handleText(d.text);
+        if (d.text && d.text.startsWith('__MW_REQUEST__')) {
+          const reqText = d.text.substring(15);
+          debugLog('request model:', reqText.match(/"model_preference"\s*:\s*"([^"]+)"/)?.[1] || '?');
+          handleText(reqText, 'request');
+          return;
+        }
+        handleText(d.text, 'response');
       } else if (d.type === 'URL_CHANGE') {
+        debugLog('URL_CHANGE:', d.href);
         STATE.lastKey = '';
         setWaiting();
       }
     });
+    debugLog('listening for page messages');
   }
 
   function injectProbe(){
-    const s = document.createElement('script');
-    s.src = chrome.runtime.getURL('page-probe.js');
-    s.async = false;
-    (document.head || document.documentElement).appendChild(s);
-    s.remove();
+    try {
+      const url = chrome.runtime.getURL('page-probe.js');
+      debugLog('injecting probe:', url);
+      const s = document.createElement('script');
+      s.src = url;
+      s.async = false;
+      const target = document.head || document.documentElement;
+      if (!target) return;
+      target.appendChild(s);
+      s.onload = function() { debugLog('probe loaded'); s.remove(); };
+      s.onerror = function() { console.error(TAG, 'probe failed to load'); s.remove(); };
+    } catch (e) {
+      console.error(TAG, 'injectProbe error:', e);
+    }
   }
 
   function initConfig(){
-    chrome.storage.sync.get({ showOverlay: true }, (cfg)=>{
+    chrome.storage.sync.get({ showOverlay: true, debugMode: false }, (cfg)=>{
       STATE.showOverlay = !!cfg.showOverlay;
+      STATE.debugMode = !!cfg.debugMode;
+      try { localStorage.setItem('mw_debug', STATE.debugMode ? '1' : '0'); } catch(_) {}
+      debugLog('init', { showOverlay: STATE.showOverlay, debugMode: STATE.debugMode });
       if (STATE.showOverlay) ensureWidget();
     });
     chrome.storage.onChanged.addListener((changes, area)=>{
       if (area !== 'sync') return;
       if (changes.showOverlay) STATE.showOverlay = !!changes.showOverlay.newValue;
+      if (changes.debugMode) {
+        STATE.debugMode = !!changes.debugMode.newValue;
+        try { localStorage.setItem('mw_debug', STATE.debugMode ? '1' : '0'); } catch(_) {}
+      }
     });
   }
 
@@ -223,5 +305,7 @@
     initConfig();
     listenFromPage();
     injectProbe();
-  } catch (e) {}
+  } catch (e) {
+    console.error(TAG, 'init error:', e);
+  }
 })();
